@@ -13,12 +13,14 @@ import {
   Button,
   ProgressBar,
 } from 'react-native-paper';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGetDealQuery } from '../services/api';
 import { RootStackParamList } from '../navigation';
 import { DealStage } from '../types/api';
 
 type RouteParams = RouteProp<RootStackParamList, 'DealDetail'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const STAGE_COLORS: Record<DealStage, string> = {
   PROSPECTING: '#808080',
@@ -31,6 +33,7 @@ const STAGE_COLORS: Record<DealStage, string> = {
 
 export default function DealDetailScreen() {
   const route = useRoute<RouteParams>();
+  const navigation = useNavigation<NavigationProp>();
   const { dealId } = route.params;
 
   const { data, isLoading } = useGetDealQuery(dealId);
@@ -201,7 +204,12 @@ export default function DealDetailScreen() {
 
         {/* Actions */}
         <View style={styles.actions}>
-          <Button mode="contained" icon="pencil" style={styles.actionButton}>
+          <Button
+            mode="contained"
+            icon="pencil"
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('EditDeal', { dealId })}
+          >
             Edit Deal
           </Button>
           <Button mode="outlined" icon="account" style={styles.actionButton}>

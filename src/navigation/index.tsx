@@ -20,6 +20,7 @@ import EditCustomerScreen from '../screens/EditCustomerScreen';
 import DealsScreen from '../screens/DealsScreen';
 import DealDetailScreen from '../screens/DealDetailScreen';
 import CreateDealScreen from '../screens/CreateDealScreen';
+import EditDealScreen from '../screens/EditDealScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 // Navigation types
@@ -42,6 +43,7 @@ export type RootStackParamList = {
   EditCustomer: { customerId: string };
   DealDetail: { dealId: string };
   CreateDeal: undefined;
+  EditDeal: { dealId: string };
 };
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -136,6 +138,11 @@ function RootNavigator() {
             name="CreateDeal"
             component={CreateDealScreen}
             options={{ headerShown: true, title: 'Create Deal' }}
+          />
+          <RootStack.Screen
+            name="EditDeal"
+            component={EditDealScreen}
+            options={{ headerShown: true, title: 'Edit Deal' }}
           />
         </>
       )}

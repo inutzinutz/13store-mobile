@@ -5,14 +5,17 @@
 
 import React from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Card, Text, Button, List, Switch, Divider } from 'react-native-paper';
+import { Card, Text, Button, List, Switch, Divider, Badge } from 'react-native-paper';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout, enableBiometric } from '../store/authSlice';
+import { processSyncQueue } from '../store/syncSlice';
 import { isBiometricSupported } from '../services/auth';
+import { manualSync } from '../services/backgroundSync';
 
 export default function ProfileScreen() {
   const dispatch = useAppDispatch();
   const { user, biometricEnabled } = useAppSelector((state) => state.auth);
+  const { queue, isSyncing, lastSyncAt } = useAppSelector((state) => state.sync);
   const [biometricAvailable, setBiometricAvailable] = React.useState(false);
 
   React.useEffect(() => {
@@ -99,11 +102,49 @@ export default function ProfileScreen() {
             />
 
             <List.Item
-              title="Sync Settings"
-              description="Configure offline sync preferences"
+              title="Sync Queue"
+              description={
+                queue.length > 0
+                  ? `${queue.length} items pending sync`
+                  : lastSyncAt
+                  ? `Last synced: ${new Date(lastSyncAt).toLocaleTimeString()}`
+                  : 'No pending items'
+              }
               left={(props) => <List.Icon {...props} icon="sync" />}
+              right={(props) =>
+                queue.length > 0 ? (
+                  <Badge style={styles.badge}>{queue.length}</Badge>
+                ) : null
+              }
               onPress={() => {
-                Alert.alert('Coming Soon', 'Sync settings screen');
+                if (queue.length > 0) {
+                  Alert.alert(
+                    'Sync Queue',
+                    `You have ${queue.length} pending items. Sync now?`,
+                    [
+                      { text: 'Cancel', style: 'cancel' },
+                      {
+                        text: 'Sync',
+                        onPress: async () => {
+                          const success = await manualSync();
+                          Alert.alert(
+                            success ? 'Success' : 'Failed',
+                            success
+                              ? 'Sync completed successfully'
+                              : 'Failed to sync. Check your connection.'
+                          );
+                        },
+                      },
+                    ]
+                  );
+                } else {
+                  Alert.alert(
+                    'Sync Status',
+                    lastSyncAt
+                      ? `Last synced at ${new Date(lastSyncAt).toLocaleString()}`
+                      : 'All data is up to date'
+                  );
+                }
               }}
             />
 
@@ -202,5 +243,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 32,
     paddingVertical: 8,
+  },
+  badge: {
+    alignSelf: 'center',
+    marginRight: 8,
   },
 });
