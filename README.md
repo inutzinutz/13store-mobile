@@ -27,6 +27,14 @@ React Native mobile application for the 13 STORE sales team, built with Expo.
 - **Manual Sync**: Trigger sync manually from Profile
 - **App Lifecycle Management**: Proper initialization and cleanup
 
+### ✅ Phase 4 (In Progress)
+- **Debounced Search**: Smart search with 500ms debouncing
+- **Advanced Filters**: Filter customers by status, type, potential
+- **Deal Filters**: Filter deals by stage
+- **Filter UI**: Modal-based filter interface with chips
+- **Active Filter Display**: Visual indicators for applied filters
+- **Filter Badges**: Count indicators on filter buttons
+
 ## Tech Stack
 
 - **React Native** + **Expo SDK 52**
@@ -72,9 +80,13 @@ src/
 │   ├── api.ts             # API types (matches API v1)
 │   ├── auth.ts            # Auth types
 │   └── sync.ts            # Sync queue types           # ✨ Phase 2
-└── components/            # Reusable components
-    ├── NetworkStatusBanner.tsx    # Network indicator  # ✨ Phase 3
-    └── SyncStatusIndicator.tsx    # Sync status icon   # ✨ Phase 3
+├── components/            # Reusable components
+│   ├── NetworkStatusBanner.tsx    # Network indicator  # ✨ Phase 3
+│   ├── SyncStatusIndicator.tsx    # Sync status icon   # ✨ Phase 3
+│   ├── CustomerFilterModal.tsx    # Filter UI          # ✨ Phase 4
+│   └── DealFilterModal.tsx        # Deal filters       # ✨ Phase 4
+└── hooks/                 # Custom hooks
+    └── useDebounce.ts     # Debounce hook              # ✨ Phase 4
 ```
 
 ## Getting Started
