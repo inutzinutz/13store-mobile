@@ -1,0 +1,236 @@
+# 13 STORE Mobile App
+
+React Native mobile application for the 13 STORE sales team, built with Expo.
+
+## Features
+
+- **Authentication**: Email/password and API key login with biometric support
+- **Customer Management**: View, search, and manage customers
+- **Deal Pipeline**: Track deals and sales opportunities
+- **Dashboard**: Real-time sales metrics and KPIs
+- **Offline-First**: Work offline with automatic sync when online
+- **Secure Storage**: Encrypted credential storage with SecureStore
+
+## Tech Stack
+
+- **React Native** + **Expo SDK 52**
+- **TypeScript** for type safety
+- **Redux Toolkit** + **RTK Query** for state management and API integration
+- **React Navigation** for navigation
+- **React Native Paper** for Material Design UI components
+- **Expo SecureStore** for secure credential storage
+- **Expo LocalAuthentication** for biometric authentication
+
+## Project Structure
+
+```
+src/
+├── config.ts              # App configuration
+├── navigation/            # Navigation setup
+│   └── index.tsx
+├── screens/               # Screen components
+│   ├── LoginScreen.tsx
+│   ├── DashboardScreen.tsx
+│   ├── CustomersScreen.tsx
+│   ├── CustomerDetailScreen.tsx
+│   ├── DealsScreen.tsx
+│   ├── DealDetailScreen.tsx
+│   └── ProfileScreen.tsx
+├── services/              # Business logic
+│   ├── auth.ts            # Authentication service
+│   └── api.ts             # RTK Query API
+├── store/                 # Redux store
+│   ├── index.ts           # Store configuration
+│   ├── hooks.ts           # Typed hooks
+│   └── authSlice.ts       # Auth state slice
+├── types/                 # TypeScript types
+│   ├── api.ts             # API types (matches API v1)
+│   └── auth.ts            # Auth types
+└── components/            # Reusable components
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 20.19.4
+- npm or yarn
+- Expo CLI (`npm install -g expo-cli`)
+- iOS Simulator (Mac) or Android Emulator
+
+### Installation
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npx expo start
+```
+
+### Running on Devices
+
+```bash
+# iOS Simulator (Mac only)
+npm run ios
+
+# Android Emulator
+npm run android
+
+# Expo Go App (on physical device)
+# Scan QR code from `npx expo start`
+```
+
+## API Configuration
+
+The app connects to the 13 STORE platform API v1:
+
+- **Production**: `https://13store-platform.vercel.app/api/v1`
+- **Development**: `http://localhost:3000/api/v1`
+
+### Authentication Methods
+
+1. **Email/Password**: Login with your platform credentials
+2. **API Key**: Use an API key from the Developer Portal
+
+To get an API key:
+1. Login to the web platform
+2. Go to Dashboard → Developer Portal
+3. Generate a new API key with required scopes
+
+## Features
+
+### Authentication
+- Email/password login
+- API key authentication
+- Biometric authentication (fingerprint/face)
+- Secure credential storage
+- Session persistence
+
+### Dashboard
+- Total customers overview
+- Active deals count
+- Pipeline value
+- Key metrics and KPIs
+
+### Customer Management
+- List all customers with pagination
+- Search customers
+- View customer details
+- Filter by status, type, potential
+- Customer tags and metadata
+
+### Deal Management
+- List all deals with pagination
+- Search deals
+- View deal details
+- Track deal stages and probability
+- Expected close dates
+
+### Profile & Settings
+- User information
+- Biometric toggle
+- API configuration
+- Logout
+
+## Development
+
+### Type Safety
+
+All API types match the platform's API v1 models:
+- `Customer`, `Deal`, `Product`, `Invoice`
+- Filter types for each resource
+- Pagination responses
+
+### State Management
+
+- **Redux Toolkit** for global state
+- **RTK Query** for API caching and synchronization
+- Automatic cache invalidation on mutations
+- Optimistic UI updates
+
+### API Integration
+
+The app uses RTK Query endpoints:
+- `useGetCustomersQuery`
+- `useGetCustomerQuery`
+- `useCreateCustomerMutation`
+- `useUpdateCustomerMutation`
+- `useDeleteCustomerMutation`
+- Similar hooks for Deals, Products, Invoices
+
+## Roadmap
+
+### Phase 1 (Current)
+- ✅ Authentication with biometrics
+- ✅ Customer list and details
+- ✅ Deal list and details
+- ✅ Dashboard with metrics
+
+### Phase 2 (Next)
+- [ ] Offline sync queue
+- [ ] Create/edit customers
+- [ ] Create/edit deals
+- [ ] GPS tracking for visits
+- [ ] Push notifications
+
+### Phase 3 (Future)
+- [ ] Invoice management
+- [ ] Product catalog
+- [ ] Camera integration
+- [ ] File attachments
+- [ ] Advanced filters
+- [ ] Export reports
+
+## Testing
+
+```bash
+# Run type check
+npx tsc --noEmit
+
+# Run linter
+npm run lint
+
+# Run tests (when available)
+npm test
+```
+
+## Building for Production
+
+```bash
+# Build for iOS
+eas build --platform ios
+
+# Build for Android
+eas build --platform android
+
+# Submit to stores
+eas submit
+```
+
+## Environment Variables
+
+Create a `.env` file for local development:
+
+```env
+API_BASE_URL=http://localhost:3000/api/v1
+WEB_BASE_URL=http://localhost:3000
+```
+
+## Contributing
+
+1. Follow the codebase structure
+2. Use TypeScript for all new files
+3. Follow React Native best practices
+4. Test on both iOS and Android
+5. Update this README when adding features
+
+## License
+
+Proprietary - 13 STORE Platform
+
+## Support
+
+For issues or questions:
+- Platform: https://13store-platform.vercel.app
+- API Docs: https://13store-platform.vercel.app/dashboard/developer/docs
