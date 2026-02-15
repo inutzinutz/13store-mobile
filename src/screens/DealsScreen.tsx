@@ -63,8 +63,20 @@ export default function DealsScreen() {
   const deals = data?.data || [];
   const pagination = data?.pagination;
 
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   const handleDealPress = (deal: Deal) => {
     navigation.navigate('DealDetail', { dealId: deal.id });
+  };
+
+  const handleApplyFilters = (newFilters: DealFilterState) => {
+    setFilters(newFilters);
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+    setPage(1);
   };
 
   const renderDealItem = ({ item }: { item: Deal }) => (
@@ -126,10 +138,15 @@ export default function DealsScreen() {
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
       <Text variant="bodyLarge">No deals found</Text>
-      {searchQuery && (
+      {(debouncedSearch || activeFilterCount > 0) && (
         <Text variant="bodyMedium" style={styles.emptySubtext}>
-          Try adjusting your search
+          Try adjusting your search or filters
         </Text>
+      )}
+      {activeFilterCount > 0 && (
+        <Button mode="text" onPress={handleClearFilters} style={styles.clearButton}>
+          Clear Filters
+        </Button>
       )}
     </View>
   );
@@ -145,12 +162,41 @@ export default function DealsScreen() {
 
   return (
     <View style={styles.container}>
-      <Searchbar
-        placeholder="Search deals..."
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        style={styles.searchbar}
-      />
+      {/* Search Bar with Filter Button */}
+      <View style={styles.searchContainer}>
+        <Searchbar
+          placeholder="Search deals..."
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={styles.searchbar}
+        />
+        <View style={styles.filterButtonContainer}>
+          <IconButton
+            icon="filter-variant"
+            size={24}
+            onPress={() => setFilterModalVisible(true)}
+            style={styles.filterButton}
+          />
+          {activeFilterCount > 0 && (
+            <Badge style={styles.filterBadge}>{activeFilterCount}</Badge>
+          )}
+        </View>
+      </View>
+
+      {/* Active Filters Display */}
+      {activeFilterCount > 0 && (
+        <View style={styles.activeFilters}>
+          {filters.stage && (
+            <Chip
+              mode="flat"
+              onClose={() => setFilters({ ...filters, stage: undefined })}
+              style={styles.filterChip}
+            >
+              Stage: {filters.stage.replace('_', ' ')}
+            </Chip>
+          )}
+        </View>
+      )}
 
       {isLoading && deals.length === 0 ? (
         <View style={styles.centerContainer}>
@@ -181,6 +227,14 @@ export default function DealsScreen() {
         style={styles.fab}
         onPress={() => navigation.navigate('CreateDeal')}
       />
+
+      {/* Filter Modal */}
+      <DealFilterModal
+        visible={filterModalVisible}
+        onDismiss={() => setFilterModalVisible(false)}
+        onApply={handleApplyFilters}
+        currentFilters={filters}
+      />
     </View>
   );
 }
@@ -195,9 +249,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   searchbar: {
-    margin: 16,
+    flex: 1,
     elevation: 2,
+  },
+  filterButtonContainer: {
+    position: 'relative',
+    marginLeft: 8,
+  },
+  filterButton: {
+    margin: 0,
+    backgroundColor: 'white',
+    elevation: 2,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF5722',
+  },
+  activeFilters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  filterChip: {
+    marginBottom: 4,
+  },
+  clearButton: {
+    marginTop: 8,
   },
   listContent: {
     padding: 16,
