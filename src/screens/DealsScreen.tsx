@@ -19,12 +19,17 @@ import {
   ActivityIndicator,
   FAB,
   ProgressBar,
+  IconButton,
+  Badge,
+  Button,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGetDealsQuery } from '../services/api';
 import { Deal, DealStage } from '../types/api';
 import { RootStackParamList } from '../navigation';
+import { useDebounce } from '../hooks/useDebounce';
+import DealFilterModal, { DealFilterState } from '../components/DealFilterModal';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -41,11 +46,16 @@ export default function DealsScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState<DealFilterState>({});
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   const { data, isLoading, isFetching, refetch } = useGetDealsQuery({
     page,
     limit: 20,
-    search: searchQuery || undefined,
+    search: debouncedSearch || undefined,
+    stage: filters.stage,
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });

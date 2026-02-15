@@ -18,12 +18,17 @@ import {
   Chip,
   ActivityIndicator,
   FAB,
+  IconButton,
+  Badge,
+  Button,
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGetCustomersQuery } from '../services/api';
 import { Customer, CustomerStatus } from '../types/api';
 import { RootStackParamList } from '../navigation';
+import { useDebounce } from '../hooks/useDebounce';
+import CustomerFilterModal, { FilterState } from '../components/CustomerFilterModal';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -39,6 +44,11 @@ export default function CustomersScreen() {
   const navigation = useNavigation<NavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState<FilterState>({});
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+
+  // Debounce search query to prevent excessive API calls
+  const debouncedSearch = useDebounce(searchQuery, 500);
 
   const {
     data,
@@ -48,7 +58,10 @@ export default function CustomersScreen() {
   } = useGetCustomersQuery({
     page,
     limit: 20,
-    search: searchQuery || undefined,
+    search: debouncedSearch || undefined,
+    status: filters.status,
+    type: filters.type,
+    potential: filters.potential,
     sortBy: 'name',
     sortOrder: 'asc',
   });
@@ -56,8 +69,20 @@ export default function CustomersScreen() {
   const customers = data?.data || [];
   const pagination = data?.pagination;
 
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   const handleCustomerPress = (customer: Customer) => {
     navigation.navigate('CustomerDetail', { customerId: customer.id });
+  };
+
+  const handleApplyFilters = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setPage(1); // Reset to first page when filters change
+  };
+
+  const handleClearFilters = () => {
+    setFilters({});
+    setPage(1);
   };
 
   const renderCustomerItem = ({ item }: { item: Customer }) => (
@@ -119,10 +144,15 @@ export default function CustomersScreen() {
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
       <Text variant="bodyLarge">No customers found</Text>
-      {searchQuery && (
+      {(debouncedSearch || activeFilterCount > 0) && (
         <Text variant="bodyMedium" style={styles.emptySubtext}>
-          Try adjusting your search
+          Try adjusting your search or filters
         </Text>
+      )}
+      {activeFilterCount > 0 && (
+        <Button mode="text" onPress={handleClearFilters} style={styles.clearButton}>
+          Clear Filters
+        </Button>
       )}
     </View>
   );
@@ -138,12 +168,59 @@ export default function CustomersScreen() {
 
   return (
     <View style={styles.container}>
-      <Searchbar
-        placeholder="Search customers..."
-        onChangeText={setSearchQuery}
-        value={searchQuery}
-        style={styles.searchbar}
-      />
+      {/* Search Bar with Filter Button */}
+      <View style={styles.searchContainer}>
+        <Searchbar
+          placeholder="Search customers..."
+          onChangeText={setSearchQuery}
+          value={searchQuery}
+          style={styles.searchbar}
+        />
+        <View style={styles.filterButtonContainer}>
+          <IconButton
+            icon="filter-variant"
+            size={24}
+            onPress={() => setFilterModalVisible(true)}
+            style={styles.filterButton}
+          />
+          {activeFilterCount > 0 && (
+            <Badge style={styles.filterBadge}>{activeFilterCount}</Badge>
+          )}
+        </View>
+      </View>
+
+      {/* Active Filters Display */}
+      {activeFilterCount > 0 && (
+        <View style={styles.activeFilters}>
+          {filters.status && (
+            <Chip
+              mode="flat"
+              onClose={() => setFilters({ ...filters, status: undefined })}
+              style={styles.filterChip}
+            >
+              Status: {filters.status}
+            </Chip>
+          )}
+          {filters.type && (
+            <Chip
+              mode="flat"
+              onClose={() => setFilters({ ...filters, type: undefined })}
+              style={styles.filterChip}
+            >
+              Type: {filters.type}
+            </Chip>
+          )}
+          {filters.potential && (
+            <Chip
+              mode="flat"
+              onClose={() => setFilters({ ...filters, potential: undefined })}
+              style={styles.filterChip}
+            >
+              Potential: {filters.potential}
+            </Chip>
+          )}
+        </View>
+      )}
 
       {isLoading && customers.length === 0 ? (
         <View style={styles.centerContainer}>
@@ -174,6 +251,14 @@ export default function CustomersScreen() {
         style={styles.fab}
         onPress={() => navigation.navigate('CreateCustomer')}
       />
+
+      {/* Filter Modal */}
+      <CustomerFilterModal
+        visible={filterModalVisible}
+        onDismiss={() => setFilterModalVisible(false)}
+        onApply={handleApplyFilters}
+        currentFilters={filters}
+      />
     </View>
   );
 }
@@ -188,9 +273,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   searchbar: {
-    margin: 16,
+    flex: 1,
     elevation: 2,
+  },
+  filterButtonContainer: {
+    position: 'relative',
+    marginLeft: 8,
+  },
+  filterButton: {
+    margin: 0,
+    backgroundColor: 'white',
+    elevation: 2,
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: '#FF5722',
+  },
+  activeFilters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  filterChip: {
+    marginBottom: 4,
+  },
+  clearButton: {
+    marginTop: 8,
   },
   listContent: {
     padding: 16,
