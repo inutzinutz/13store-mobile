@@ -169,10 +169,7 @@ export default function DealsScreen() {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => {
-          // TODO: Navigate to create deal screen
-          console.log('Create deal');
-        }}
+        onPress={() => navigation.navigate('CreateDeal')}
       />
     </View>
   );

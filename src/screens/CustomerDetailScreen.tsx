@@ -13,12 +13,14 @@ import {
   Button,
   Divider,
 } from 'react-native-paper';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useGetCustomerQuery } from '../services/api';
 import { RootStackParamList } from '../navigation';
 import { CustomerStatus } from '../types/api';
 
 type RouteParams = RouteProp<RootStackParamList, 'CustomerDetail'>;
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const STATUS_COLORS: Record<CustomerStatus, string> = {
   LEAD: '#FFA500',
@@ -30,6 +32,7 @@ const STATUS_COLORS: Record<CustomerStatus, string> = {
 
 export default function CustomerDetailScreen() {
   const route = useRoute<RouteParams>();
+  const navigation = useNavigation<NavigationProp>();
   const { customerId } = route.params;
 
   const { data, isLoading, refetch } = useGetCustomerQuery(customerId);
@@ -205,8 +208,13 @@ export default function CustomerDetailScreen() {
 
         {/* Actions */}
         <View style={styles.actions}>
-          <Button mode="contained" icon="pencil" style={styles.actionButton}>
-            Edit
+          <Button
+            mode="contained"
+            icon="pencil"
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('EditCustomer', { customerId })}
+          >
+            Edit Customer
           </Button>
           <Button mode="outlined" icon="phone" style={styles.actionButton}>
             Call

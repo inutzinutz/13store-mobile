@@ -10,13 +10,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { restoreSession } from '../store/authSlice';
 
-// Screens (will be created)
+// Screens
 import LoginScreen from '../screens/LoginScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import CustomersScreen from '../screens/CustomersScreen';
 import CustomerDetailScreen from '../screens/CustomerDetailScreen';
+import CreateCustomerScreen from '../screens/CreateCustomerScreen';
+import EditCustomerScreen from '../screens/EditCustomerScreen';
 import DealsScreen from '../screens/DealsScreen';
 import DealDetailScreen from '../screens/DealDetailScreen';
+import CreateDealScreen from '../screens/CreateDealScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 // Navigation types
@@ -35,7 +38,10 @@ export type RootStackParamList = {
   Auth: undefined;
   Main: undefined;
   CustomerDetail: { customerId: string };
+  CreateCustomer: undefined;
+  EditCustomer: { customerId: string };
   DealDetail: { dealId: string };
+  CreateDeal: undefined;
 };
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
@@ -112,9 +118,24 @@ function RootNavigator() {
             options={{ headerShown: true, title: 'Customer Details' }}
           />
           <RootStack.Screen
+            name="CreateCustomer"
+            component={CreateCustomerScreen}
+            options={{ headerShown: true, title: 'Create Customer' }}
+          />
+          <RootStack.Screen
+            name="EditCustomer"
+            component={EditCustomerScreen}
+            options={{ headerShown: true, title: 'Edit Customer' }}
+          />
+          <RootStack.Screen
             name="DealDetail"
             component={DealDetailScreen}
             options={{ headerShown: true, title: 'Deal Details' }}
+          />
+          <RootStack.Screen
+            name="CreateDeal"
+            component={CreateDealScreen}
+            options={{ headerShown: true, title: 'Create Deal' }}
           />
         </>
       )}

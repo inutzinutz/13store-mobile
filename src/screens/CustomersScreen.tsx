@@ -172,10 +172,7 @@ export default function CustomersScreen() {
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => {
-          // TODO: Navigate to create customer screen
-          console.log('Create customer');
-        }}
+        onPress={() => navigation.navigate('CreateCustomer')}
       />
     </View>
   );
